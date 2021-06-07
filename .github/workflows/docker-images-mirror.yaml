@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - # copy multiplatform image from dockerhub to quay and ghcr
+        name: Push Image to multiple registries 1
+        uses: akhilerm/tag-push-action@v1.0.0
+        with:
+          src: docker.io/seldonio/engine:1.4.0
+          dst: docker.io/txmao/kf12-test-docker.io.seldonio.engine:1.4.0
+
+      - # copy multiplatform image from dockerhub to quay and ghcr
+        name: Push Image to multiple registries 2
+        uses: akhilerm/tag-push-action@v1.0.0
+        with:
+          src: gcr.io/ml-pipeline/frontend:1.0.4
+          dst: docker.io/txmao/kf12-test-gcr.io.ml-pipeline.frontend:1.0.4
+
+      - # copy multiplatform image from dockerhub to quay and ghcr
+        name: Push Image to multiple registries 3
+        uses: akhilerm/tag-push-action@v1.0.0
+        with:
+          src: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:d066ae5b642885827506610ae25728d442ce11447b82df6e9cc4c174bb97ecb3.0
+          dst: docker.io/txmao/kf12-test-gcr.io.knative-releases.knative.dev.serving.cmd.queue@sha256:d066ae5b642885827506610ae25728d442ce11447b82df6e9cc4c174bb97ecb3
+
+      - # copy multiplatform image from dockerhub to quay and ghcr
+        name: Push Image to multiple registries 4
+        uses: akhilerm/tag-push-action@v1.0.0
+        with:
+          src: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:d066ae5b642885827506610ae25728d442ce11447b82df6e9cc4c174bb97ecb3.0
+          dst: docker.io/txmao/kf12-test-gcr.io.knative-releases.knative.dev.serving.cmd.queue:d066ae5
