@@ -33,7 +33,7 @@ jobs:
       - name: create tasks
         id: set-matrix
         run: |
-          output = $(python tools/tasksprovider.py)
+          output=$(python tools/tasksprovider.py)
           echo "::set-output name=matrix::$output"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
