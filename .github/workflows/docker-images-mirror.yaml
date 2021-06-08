@@ -1,4 +1,4 @@
-name: ci
+name: copy_docker_image
 
 on: [push]
 # push:
@@ -31,13 +31,6 @@ jobs:
         with:
           src: gcr.io/ml-pipeline/frontend:1.0.4
           dst: docker.io/txmao/kf12-test-gcr.io.ml-pipeline.frontend:1.0.4
-
-      - # copy multiplatform image from dockerhub to quay and ghcr
-        name: Push Image to multiple registries 3
-        uses: akhilerm/tag-push-action@v1.0.0
-        with:
-          src: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:d066ae5b642885827506610ae25728d442ce11447b82df6e9cc4c174bb97ecb3.0
-          dst: docker.io/txmao/kf12-test-gcr.io.knative-releases.knative.dev.serving.cmd.queue@sha256:d066ae5b642885827506610ae25728d442ce11447b82df6e9cc4c174bb97ecb3
 
       - # copy multiplatform image from dockerhub to quay and ghcr
         name: Push Image to multiple registries 4
