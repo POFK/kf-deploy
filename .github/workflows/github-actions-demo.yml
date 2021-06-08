@@ -35,9 +35,9 @@ jobs:
       - name: create tasks
         id: set-matrix
         run: |
-          output=$(echo $(python tools/tasksprovider.py)
-          output=echo $output | sed 's/ //g')
-          output=echo $output | sed 's/"/\\\"\"/g')
+          output=$(python tools/tasksprovider.py)
+          output=$(echo $output | sed 's/ //g')
+          output=$(echo $output | sed 's/"/\\\"\"/g')
           echo "::set-output name=matrix::$output"
 
   check-matrix:
