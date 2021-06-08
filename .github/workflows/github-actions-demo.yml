@@ -32,7 +32,9 @@ jobs:
           if [ -f tools/requirements.txt ]; then pip install -r tools/requirements.txt; fi
       - name: create tasks
         id: set-matrix
-        run: echo `python tools/tasksprovider.py`
+        run: |
+          output = $(python tools/tasksprovider.py)
+          echo "::set-output name=matrix::$output"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 

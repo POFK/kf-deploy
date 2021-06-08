@@ -20,5 +20,4 @@ for i in range(3):
     data['des'] = i * 10
     Data["include"].append(data)
 output = json.dumps(Data)
-pre = "::set-output name=matrix::"
-print(pre+output)
+print(output)
