@@ -16,10 +16,10 @@ jobs:
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Test-Matrix:
-  strategy:
-    matrix:
-      src: [1, 2, 3]
-      des: [10, 20, 30]
+    strategy:
+      matrix:
+        src: [1, 2, 3]
+        des: [10, 20, 30]
     runs-on: ubuntu-latest
     steps:
       - run: echo "test {{ matrix.src }}-{{ matrix.des }}"
