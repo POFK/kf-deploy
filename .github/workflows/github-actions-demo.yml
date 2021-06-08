@@ -27,4 +27,4 @@ jobs:
            src: "2"
            des: "20"
     steps:
-      - run: echo test version {{ matrix.src }}-{{ matrix.des }}
+      - run: echo test version ${{ matrix.src }}-${{ matrix.des }}
