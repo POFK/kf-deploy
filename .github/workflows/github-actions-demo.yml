@@ -49,7 +49,7 @@ jobs:
     needs: setmatrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        cfg: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
+#     matrix: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
+      matrix: ${{ needs.setmatrix.outputs.matrix }}
     steps:
-      - run: echo test version ${{ matrix.cfg.src }}-${{ matrix.cfg.des }}
+      - run: echo test version ${{ matrix.src }}-${{ matrix.des }}
