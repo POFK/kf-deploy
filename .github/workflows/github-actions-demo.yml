@@ -15,8 +15,10 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-  provide-matrix-json:
+  setmatrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -33,23 +35,21 @@ jobs:
       - name: create tasks
         id: set-matrix
         run: |
-          output=$(python tools/tasksprovider.py)
+          output=$(echo $(python tools/tasksprovider.py) | sed 's/ //g')
           echo "::set-output name=matrix::$output"
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   check-matrix:
-    needs: provide-matrix-json
+    needs: setmatrix
     runs-on: ubuntu-latest
     steps:
       - name: check matrix
-        run: echo ${{ needs.provide-matrix-json.outputs.matrix }}
+        run: echo ${{ needs.setmatrix.outputs.matrix }}
 
   Test-Matrix:
-    needs: provide-matrix-json
+    needs: setmatrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        data: ${{ needs.provide-matrix-json.outputs.matrix }}
+        cfg: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
     steps:
-      - run: echo test version ${{ matrix.data.src }}-${{ matrix.data.des }}
+      - run: echo test version ${{ matrix.cfg.src }}-${{ matrix.cfg.des }}
