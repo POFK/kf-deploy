@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: check matrix
-        run: echo ${{ needs.setmatrix.outputs.matrix }}
+        run: echo ${{ fromJson(needs.setmatrix.outputs.matrix) }}
 
   Test-Matrix:
     needs: setmatrix
