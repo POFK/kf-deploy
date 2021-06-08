@@ -16,8 +16,8 @@ import yaml, json
 Data = {"include": []}
 for i in range(3):
     data = {}
-    data['src'] = i
-    data['des'] = i * 10
+    data['src'] = str(i)
+    data['des'] = str(i * 10)
     Data["include"].append(data)
 output = json.dumps(Data)
 print(output)
