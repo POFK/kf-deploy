@@ -15,16 +15,32 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  provide-matrix-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      # You can test your matrix by printing the current Python version
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f tools/requirements.txt ]; then pip install -r tools/requirements.txt; fi
+      - name: create tasks
+        id: set-matrix
+        run: python tools/taskprovider.py
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
   Test-Matrix:
+    needs: provide-matrix-json
     runs-on: ubuntu-latest
     strategy:
       matrix:
-       include:
-         - ind: 1
-           src: "1"
-           des: "10"
-         - ind: 2
-           src: "2"
-           des: "20"
+        package: ${{ fromJson(needs.provide_matrix_json.outputs.matrix) }}
     steps:
       - run: echo test version ${{ matrix.src }}-${{ matrix.des }}
