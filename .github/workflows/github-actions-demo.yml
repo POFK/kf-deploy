@@ -38,6 +38,13 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
+  check-matrix:
+    needs: provide-matrix-json
+    runs-on: ubuntu-latest
+    steps:
+      - name: check matrix
+        run: echo ${{ needs.provide-matrix-json.outputs.matrix }}
+
   Test-Matrix:
     needs: provide-matrix-json
     runs-on: ubuntu-latest

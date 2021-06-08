@@ -1,9 +1,9 @@
 name: copy_docker_image
 
-on: [push]
-# push:
-#   branches:
-#     - 'master'
+on: # [push]
+  push:
+    branches:
+      - 'master'
 
 jobs:
   docker:
