@@ -35,7 +35,9 @@ jobs:
       - name: create tasks
         id: set-matrix
         run: |
-          output=$(echo $(python tools/tasksprovider.py) | sed 's/ //g')
+          output=$(echo $(python tools/tasksprovider.py)
+          output=echo $output | sed 's/ //g')
+          output=echo $output | sed 's/"/\\\"\"/g')
           echo "::set-output name=matrix::$output"
 
   check-matrix:
@@ -49,7 +51,6 @@ jobs:
     needs: setmatrix
     runs-on: ubuntu-latest
     strategy:
-#     matrix: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
-      matrix: ${{ needs.setmatrix.outputs.matrix }}
+      matrix: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
     steps:
       - run: echo test version ${{ matrix.src }}-${{ matrix.des }}
