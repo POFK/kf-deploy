@@ -32,9 +32,7 @@ jobs:
           if [ -f tools/requirements.txt ]; then pip install -r tools/requirements.txt; fi
       - name: create tasks
         id: set-matrix
-        run: |
-          output=$(python tools/tasksprovider.py)
-          echo "::set-output name=matrix::$output"
+        run: python tools/tasksprovider.py
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -43,6 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: ${{ fromJson(needs.provide_matrix_json.outputs.matrix) }}
+        package: ${{ fromJson(needs.provide-matrix-json.outputs.matrix) }}
     steps:
       - run: echo test version ${{ matrix.src }}-${{ matrix.des }}
