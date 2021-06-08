@@ -50,6 +50,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        data: ${{ fromJson(needs.provide-matrix-json.outputs.matrix) }}
+        data: ${{ needs.provide-matrix-json.outputs.matrix }}
     steps:
       - run: echo test version ${{ matrix.data.src }}-${{ matrix.data.des }}
