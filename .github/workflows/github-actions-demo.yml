@@ -22,4 +22,4 @@ jobs:
       des: [10, 20, 30]
     runs-on: ubuntu-latest
     steps:
-      run: echo "test {{ matrix.src }}-{{ matrix.des }}"
+      - run: echo "test {{ matrix.src }}-{{ matrix.des }}"
