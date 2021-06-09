@@ -6,7 +6,7 @@ class SetImage(object):
 
     def __init__(self, base='', is_write=False):
         self.base = base
-        self.pre = "txmao/kf12-"
+        self.pre = "docker.io/txmao/kf12-"
         self.is_write = is_write
 
     def findfiles(self):
@@ -43,7 +43,10 @@ class SetImage(object):
 #           if image["newTag"] == "latest":
 #               image["newTag"] = "kf12"
             sp = ":"
-        image["pull"] = "{}{}{}".format(image["name"],sp,image["tag"])
+        pre=""
+        if ".io" not in image["name"].split("/")[0]:
+            pre="docker.io/"
+        image["pull"] = "{}{}{}{}".format(pre,image["name"],sp,image["tag"])
         image["newName"] = self.pre+image["name"].replace("/",".")
         image["push"] = "{}{}{}".format(image["newName"],":",image["newTag"])
         return image
@@ -51,7 +54,8 @@ class SetImage(object):
     def create_action_matrix(self):
         images = self.images
         self.remove_image_with_env(images)
-        self.matrix_data = {"include": [{"src": i["pull"], "des": i["push"]} for i in images] }
+        images = self.remove_repeat_items(images)
+        self.matrix_data = {"include": [{"src": i["pull"], "dst": i["push"]} for i in images[:]] }
 
     def matrix_output(self):
         print(json.dumps(self.matrix_data).replace(" ",""))
@@ -77,6 +81,17 @@ class SetImage(object):
         for im in remove:
             images.remove(im)
 
+    def remove_repeat_items(self, images):
+        srclist = []
+        newimages = []
+        for im in images:
+            src = im["name"]+im["tag"]
+            if src in srclist:
+                continue
+            srclist.append(src)
+            newimages.append(im)
+        return newimages
+
     def run(self):
         si.findfiles()
         self.images = []
@@ -97,7 +112,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dry-run', action='store_true')
     args = parser.parse_args()
-#   import pprint
+    import pprint
 
     base = "/config/workspace/learnk8s/kubeflow/kf-test/.cache/manifests"
     si = SetImage(base=base, is_write=not args.dry_run)
