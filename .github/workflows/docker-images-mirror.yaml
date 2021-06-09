@@ -21,8 +21,12 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     needs: setmatrix
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
-      matrix: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
+      fail-fast: false
+      matrix: |
+        experimental: [true]
+        cfg: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -37,5 +41,5 @@ jobs:
         name: Push Image to dockerhub registrie
         uses: akhilerm/tag-push-action@v1.0.0
         with:
-          src: ${{ matrix.src }}
-          dst: ${{ matrix.dst }}
+          src: ${{ matrix.cfg.src }}
+          dst: ${{ matrix.cfg.dst }}
