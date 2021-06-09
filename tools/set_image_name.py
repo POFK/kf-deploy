@@ -44,8 +44,10 @@ class SetImage(object):
 #               image["newTag"] = "kf12"
             sp = ":"
         pre=""
+        if "/" not in image["name"]:
+            pre="library/"+pre
         if ".io" not in image["name"].split("/")[0]:
-            pre="docker.io/"
+            pre="docker.io/"+pre
         image["pull"] = "{}{}{}{}".format(pre,image["name"],sp,image["tag"])
         image["newName"] = self.pre+image["name"].replace("/",".")
         image["push"] = "{}{}{}".format(image["newName"],":",image["newTag"])
@@ -55,7 +57,7 @@ class SetImage(object):
         images = self.images
         self.remove_image_with_env(images)
         images = self.remove_repeat_items(images)
-        self.matrix_data = {"include": [{"src": i["pull"], "dst": i["push"]} for i in images[:]] }
+        self.matrix_data = {"include": [{"src": i["pull"], "dst": i["push"]} for i in images] }
 
     def matrix_output(self):
         print(json.dumps(self.matrix_data).replace(" ",""))
