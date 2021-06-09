@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      # You can test your matrix by printing the current Python version
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
       - name: Install dependencies
@@ -35,8 +34,7 @@ jobs:
       - name: create tasks
         id: set-matrix
         run: |
-          output=$(python tools/tasksprovider.py)
-          output=$(echo $output | sed 's/ //g')
+          output=$(cat tools/replace_images.yaml)
           echo "::set-output name=matrix::$output"
 
   check-matrix:
@@ -52,4 +50,4 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.setmatrix.outputs.matrix) }}
     steps:
-      - run: echo test version ${{ matrix.src }}-${{ matrix.des }}
+      - run: echo ${{ matrix.src }}--->${{ matrix.des }}
