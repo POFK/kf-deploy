@@ -37,7 +37,7 @@ jobs:
         name: Push Image to dockerhub registrie
         uses: akhilerm/tag-push-action@v1.0.0
         with:
-          src: mysql:latest
+          src: docker.io/library/mysql:latest
           dst: docker.io/txmao/testmysql:test
 #         src: ${{ matrix.src }}
 #         dst: ${{ matrix.dst }}
