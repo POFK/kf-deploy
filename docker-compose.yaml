@@ -3,7 +3,7 @@ version: "3.8"
 services:
 
   nginx-proxy:
-    image: jwilder/nginx-proxy:0.8.0
+    image: workflow-nginx-proxy
     build:
       context: ./docker-tools/nginx-proxy
       dockerfile: Dockerfile
