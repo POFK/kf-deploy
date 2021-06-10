@@ -4,6 +4,9 @@ services:
 
   nginx-proxy:
     image: jwilder/nginx-proxy:0.8.0
+    build:
+      context: ./docker-tools/nginx-proxy
+      dockerfile: Dockerfile
     container_name: workflow-nginx-proxy
     restart: always
     ports:
