@@ -1,0 +1,6 @@
+ansible_python_interpreter: /usr/bin/python3
+
+node_docker_home: "/home/data/docker"
+node_docker_storage_driver: overlay2
+
+node_dockercompose_enabled: true

@@ -1,0 +1,14 @@
+---
+- name: update docker home from install default
+  template:
+    src: templates/docker_pangu/daemon.json
+    dest: /etc/docker/daemon.json
+  register: docker_config
+
+- name: restart docker
+  service:
+     name: docker
+     state: restarted
+  when: docker_config.changed
+  tags:
+    - skip_ansible_lint

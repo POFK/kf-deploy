@@ -1,0 +1,24 @@
+- hosts: ccg
+
+  pre_tasks:
+
+  - import_tasks: tasks/add_hosts_pangu.yml
+
+  roles:
+
+    - role: geerlingguy.docker
+      vars:
+        docker_compose_url: "http://nexus.nova.ccg/repository/raw/docker/docker-compose/docker-compose-Linux-x86_64"
+        docker_apt_release_channel: stable
+        docker_apt_arch: amd64
+        docker_apt_repository: "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu bionic stable"
+        docker_apt_ignore_key_error: True
+        docker_apt_gpg_key: https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg
+        docker_install_compose: true
+        docker_users:
+        - "{{ ansible_ssh_user }}"
+
+  tasks:
+  - import_tasks: tasks/docker_node.yml
+    when: (dockercompose_enabled | default(False))
+    tags: dockercompose

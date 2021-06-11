@@ -1,0 +1,6 @@
+[all]
+## Example when running from a remote workstation
+gnova.ccg ansible_host=gnova ansible_ssh_user=kflow
+
+[ccg]
+gnova.ccg

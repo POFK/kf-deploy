@@ -1,0 +1,7 @@
+{
+  "data-root": "{{ node_docker_home }}",
+  "storage-driver": "{{ node_docker_storage_driver }}",
+  "registry-mirrors": ["http://nexus.nova.ccg:8083"],
+  "insecure-registries":["nexus.nova.ccg:5000","nexus.nova.ccg:8083"]
+
+}
