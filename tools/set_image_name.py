@@ -62,9 +62,13 @@ class SetImage(object):
         print(json.dumps(self.matrix_data).replace(" ",""))
 
     def save_updated_images_in_config(self, fp, parsed_images, data):
+        data["images"] = [{k: im[k] for k in ("name", "newTag", "newName")} for im in parsed_images]
+        # check image changes
+        print(fp)
+        #pprint.pprint(data["images"])
+        # check image changes
         if not self.is_write:
             return 0
-        data["images"] = [{k: im[k] for k in ("name", "newTag", "newName")} for im in parsed_images]
         self.writeconfig(fp, data)
 
     def check_env_params(self, images, fp):
