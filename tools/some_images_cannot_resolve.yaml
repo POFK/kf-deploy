@@ -1,0 +1,10 @@
+{"src":"gcr.io/istio-release/proxy_init:release-1.3-latest-daily","dst":"docker.io/txmao/kf12-gcr.io.istio-release.proxy_init:release-1.3-latest-daily","experimental":true}
+{"src":"gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance","dst":"docker.io/txmao/kf12-gcr.io.ml-pipeline.minio:RELEASE.2019-08-14T20-37-41Z-license-compliance","experimental":true}
+
+images:
+- name: gcr.io/istio-release/proxy_init
+  newName: docker.io/txmao/kf12-gcr.io.istio-release.proxy_init
+  newTag: release-1.3-latest-daily
+- name: gcr.io/ml-pipeline/minio
+  newName: docker.io/txmao/kf12-gcr.io.ml-pipeline.minio
+  newTag: RELEASE.2019-08-14T20-37-41Z-license-compliance
