@@ -107,8 +107,11 @@ class KustomizeTools(object):
         data = self.loadconfig(fp)
         node = TreeNode(fp)
         over_node.add_base(node)
-        node.resources = [os.path.join(file["dir"], res) for res in data["resources"]]
-        if self.checkimageupdate(data):
+        base_resources = [os.path.join(file["dir"], res) for res in data["resources"]]
+        if "bases" in data:
+            base_resources += [os.path.join(file["dir"], res) for res in data["bases"]]
+        node.resources = base_resources
+        if self.checkimageupdate(data) and node.over[0] is not self.root:
             node.images = {fp: data['images']}
         return node
 
