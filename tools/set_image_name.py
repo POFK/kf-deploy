@@ -1,29 +1,81 @@
 import os
 import yaml
 import json
+import pprint
+from datetime import date
 
-class SetImage(object):
+class Node(object):
 
-    def __init__(self, base='', is_write=False):
-        self.base = base
-        self.pre = "docker.io/txmao/kf12-"
-        self.is_write = is_write
+    def __init__(self, name):
+        self.name = name
 
-    def findfiles(self):
-        listOfFiles = []
-        for (dirpath, dirnames, filenames) in os.walk(base):
-            for file in filenames:
-                if "kustomization.yaml" in file:
-                    listOfFiles.append(os.path.join(dirpath, file))
-        self.files = listOfFiles
+    def __str__(self, level=0):
+        log = "<Node {}>".format(self.name)
+        return log
 
-    def loadconfig(self, file):
-        with open(file, 'r') as stream:
-            try:
-                data = yaml.safe_load(stream)
-            except yaml.YAMLError as exc:
-                print(exc)
-        return data
+    def __repr__(self):
+        return self.__str__()
+
+class TreeNode(Node):
+
+    def __init__(self, conf_path='', base=None, over=None):
+        name = self.hash_node_name(conf_path)
+        self.base = []
+        self.over = []
+        self.images = {}
+        self.path = conf_path
+        if base:
+            self.add_base(base)
+        if over:
+            self.add_over(over)
+        super(TreeNode, self).__init__(name)
+
+    def __str__(self, level=0):
+        ret = "-->\t"*level+repr(self.name)+"\n"
+        for base in self.base:
+            ret += base.__str__(level+1)
+        return ret
+
+    def hash_node_name(self, path):
+        return str(abs(hash(path)) % (10 ** 8))
+
+    def add_base(self, obj=None):
+        if obj is None:
+            raise ValueError('please input obj name or treenode')
+        elif obj and not isinstance(obj, TreeNode):
+            obj = TreeNode(obj)
+        if obj not in self.base:
+            self.base.append(obj)
+        if self not in obj.over:
+            obj.add_over(self)
+
+    def add_over(self, obj=None):
+        if obj is None:
+            raise ValueError('please input obj name or treenode')
+        elif obj and not isinstance(obj, TreeNode):
+            obj = TreeNode(obj)
+        if obj not in self.over:
+            self.over.append(obj)
+        if self not in obj.base:
+            obj.add_base(self)
+
+
+class KustomizeTools(object):
+    def __init__(self, basedir=''):
+        self.basedir = basedir
+        self.root = TreeNode(conf_path=basedir)
+        self.root.resources = [self.root.path]
+
+    def collect_base_images(self, obj):
+        for base in obj.base:
+            obj.images = {**obj.images, **self.collect_base_images(base)}
+        return obj.images
+
+    def is_conf_file(self, fname):
+        return "kustomization.yaml" in fname
+
+    def add_conf_suffix(self, fname):
+        return os.path.join(fname, "kustomization.yaml")
 
     def writeconfig(self, file, data):
         with open(file, 'w') as fp:
@@ -31,6 +83,66 @@ class SetImage(object):
 
     def checkimageupdate(self, data):
         return "images" in data
+
+    def findfiles(self, basedir):
+        listOfFiles = []
+        for (dirpath, dirnames, filenames) in os.walk(basedir):
+            for file in filenames:
+                if self.is_conf_file(file):
+                    listOfFiles.append({"dir": dirpath, "file": file})
+        return listOfFiles
+
+    def loadconfig(self, file):
+        if not self.is_conf_file(file):
+            file = self.add_conf_suffix(file)
+        with open(file, 'r') as stream:
+            try:
+                data = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+        return data
+
+    def get_base_resources(self, file, over_node):
+        fp = os.path.join(file['dir'],file['file'])
+        data = self.loadconfig(fp)
+        node = TreeNode(fp)
+        over_node.add_base(node)
+        node.resources = [os.path.join(file["dir"], res) for res in data["resources"]]
+        if self.checkimageupdate(data):
+            node.images = {fp: data['images']}
+        return node
+
+    def create_ktree(self, node):
+        """
+        usage: self.create_ktree(self.root)
+        """
+        for res in node.resources:
+            base_files = self.findfiles(res)
+            for fp in base_files:
+                base_node = self.get_base_resources(fp, node)
+                self.create_ktree(base_node)
+
+class SetImage(KustomizeTools):
+
+    def __init__(self, is_write=False, **kwargs):
+        self.pre = "docker.io/txmao/kf12-"
+        self.today_tag = date.today().strftime("%Y%m%d")
+        self.is_write = is_write
+        super(SetImage, self).__init__(**kwargs)
+
+    def __call__(self):
+        self.create_ktree(self.root)
+        self.collect_base_images(self.root)
+        self.images = []
+        for node in self.root.base:
+            if len(node.images) == 0:
+                continue
+            data = self.loadconfig(node.path)
+            images = sum(list(node.images.values()), [])
+            images = [self.parse_image(im) for im in images]
+            self.save_updated_images_in_config(node.path, images, data)
+            self.images += images
+        self.create_action_matrix()
 
     def parse_image(self, image):
         if "digest" in image:
@@ -40,8 +152,8 @@ class SetImage(object):
             sp = "@"
         else:
             image["tag"] = image["newTag"]
-#           if image["newTag"] == "latest":
-#               image["newTag"] = "kf12"
+            if image["newTag"] == "latest":
+                image["newTag"] = self.today_tag
             sp = ":"
         pre=""
         if "/" not in image["name"]:
@@ -58,14 +170,15 @@ class SetImage(object):
         self.remove_image_with_env(images)
         images = self.remove_repeat_items(images)
         self.matrix_data = {"include": [{"src": i["pull"], "dst": i["push"], "experimental":True} for i in images] }
+
     def matrix_output(self):
         print(json.dumps(self.matrix_data).replace(" ",""))
+
 
     def save_updated_images_in_config(self, fp, parsed_images, data):
         data["images"] = [{k: im[k] for k in ("name", "newTag", "newName")} for im in parsed_images]
         # check image changes
-        print(fp)
-        #pprint.pprint(data["images"])
+#       print(fp, len(data["images"]))
         # check image changes
         if not self.is_write:
             return 0
@@ -97,19 +210,6 @@ class SetImage(object):
             newimages.append(im)
         return newimages
 
-    def run(self):
-        si.findfiles()
-        self.images = []
-        for fp in si.files:
-            data = si.loadconfig(fp)
-            if si.checkimageupdate(data):
-                #self.check_env_params(data["images"], fp)
-                images = [self.parse_image(im) for im in data["images"]]
-                self.save_updated_images_in_config(fp, images, data)
-                self.images += images
-        self.create_action_matrix()
-
-
 
 if __name__ == '__main__':
     # usage: python set_image_name.py --dry-run
@@ -119,8 +219,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     import pprint
 
-    base = "/config/workspace/learnk8s/kubeflow/kf-test/.cache/manifests"
-    si = SetImage(base=base, is_write=not args.dry_run)
-    si.run()
+    si = SetImage(basedir="/config/workspace/learnk8s/kubeflow/kf-test/kustomize", is_write=not args.dry_run)
+    si()
     si.matrix_output()
+
 #   pprint.pprint(si.matrix_data)
