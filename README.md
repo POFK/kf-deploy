@@ -40,3 +40,8 @@ http://nexus.nova.ccg/repository/raw-host/
 http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/v1.2-branch.tar.gz
 http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
 http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_istio_dex.v1.2.0.yaml
+
+# manually download some images:
+- gcr.io/istio-release/proxy_init:release-1.3-latest-daily
+- gcr.io/istio-release/proxyv2:release-1.3-latest-daily
+- gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance

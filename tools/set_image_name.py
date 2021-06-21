@@ -2,6 +2,7 @@ import os
 import yaml
 import json
 import pprint
+import subprocess
 from datetime import date
 
 class Node(object):
@@ -129,7 +130,9 @@ class SetImage(KustomizeTools):
 
     def __init__(self, is_write=False, **kwargs):
         self.pre = "docker.io/txmao/kf12-"
-        self.today_tag = date.today().strftime("%Y%m%d")
+        #self.today_tag = date.today().strftime("%Y%m%d")
+        self.today_tag = subprocess.check_output(["git", "describe", "--tag"]).strip().decode('ascii')
+        self.today_tag = "txmao-" + self.today_tag
         self.is_write = is_write
         super(SetImage, self).__init__(**kwargs)
 
