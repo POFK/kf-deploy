@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- behavior: merge
+  envs:
+  - ./params.env
+  name: dex-parameters
+images:
+- name: quay.io/dexidp/dex
+  newName: docker.io/txmao/kf12-quay.io.dexidp.dex
+  newTag: v2.22.0
+kind: Kustomization
+patchesStrategicMerge:
+- config-map.yaml
+resources:
+- ../../.cache/manifests/manifests-1.2-branch/dex-auth/dex-crds/overlays/github
+vars:
+- fieldref:
+    fieldPath: data.oidc_redirect_uri
+  name: oidc_redirect_uri
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: dex-parameters

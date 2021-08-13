@@ -1,0 +1,13 @@
+# Dex Server Parameters (some params are shared with client)
+dex_domain=
+namespace=auth
+issuer=http://dex.auth.svc.cluster.local:5556/dex
+client_id=kubeflow-oidc-authservice
+oidc_redirect_uris=['/login/oidc']
+oidc_redirect_uri=http://dex.auth.svc.cluster.local:5556/dex/callback
+application_secret=
+github_client_id=
+github_client_secret=
+github_hostname=
+github_org_name=
+github_use_login_as_id=true

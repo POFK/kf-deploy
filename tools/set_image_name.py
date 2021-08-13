@@ -108,7 +108,9 @@ class KustomizeTools(object):
         data = self.loadconfig(fp)
         node = TreeNode(fp)
         over_node.add_base(node)
-        base_resources = [os.path.join(file["dir"], res) for res in data["resources"]]
+        base_resources = []
+        if "resources" in data:
+            base_resources += [os.path.join(file["dir"], res) for res in data["resources"]]
         if "bases" in data:
             base_resources += [os.path.join(file["dir"], res) for res in data["bases"]]
         node.resources = base_resources
@@ -227,8 +229,8 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dry-run', action='store_true')
     args = parser.parse_args()
     import pprint
-
-    si = SetImage(basedir="/config/workspace/learnk8s/kubeflow/kf-test/kustomize", is_write=not args.dry_run)
+    basedir = os.path.join(os.getenv('KF_DIR'),"kustomize")
+    si = SetImage(basedir=basedir, is_write=not args.dry_run)
     si()
     si.matrix_output()
 
