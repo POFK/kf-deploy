@@ -182,8 +182,11 @@ kubectl create secret tls login.gnova.ccg.tls --cert=ssl/cert.pem --key=ssl/key.
 ```
 
 # pvc
-Check it later!
-https://v1-2-branch.kubeflow.org/docs/distributions/kfctl/multi-user/#provisioning-of-persistent-volumes-in-kubernetes
+```
+kubectl apply -f pvc/local-path-storage.yaml
+```
+
+- https://v1-2-branch.kubeflow.org/docs/distributions/kfctl/multi-user/#provisioning-of-persistent-volumes-in-kubernetes
 
 ## 添加用户
 ### Add user to github team
@@ -272,7 +275,7 @@ kubectl edit profile ${NAME}
 1. https://illya13.github.io/RL/tutorial/2020/05/03/install-kubeflow-on-single-node-kubernetes-v1.18.2.html
 
 ## nexus raw repositories
-http://nexus.nova.ccg/repository/raw-host/
-http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/v1.2-branch.tar.gz
-http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
-http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_istio_dex.v1.2.0.yaml
+- http://nexus.nova.ccg/repository/raw-host/
+- http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/v1.2-branch.tar.gz
+- http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
+- http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_istio_dex.v1.2.0.yaml
