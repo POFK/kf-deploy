@@ -3,8 +3,8 @@ import os
 import yaml
 
 res_dict = {
-    "small": {"cpu":"12.5", "memory":"64Gi", "requests.nvidia.com/gpu":"1", "persistentvolumeclaims":"3", "requests.storage":"100Gi"},
-    "mid": {"cpu":"24.5", "memory":"128Gi", "requests.nvidia.com/gpu":"2", "persistentvolumeclaims":"4", "requests.storage":"500Gi"},
+    "small": {"cpu":"12.5", "memory":"64Gi", "requests.nvidia.com/gpu":"1", "persistentvolumeclaims":"5", "requests.storage":"100Gi"},
+    "mid": {"cpu":"24.5", "memory":"128Gi", "requests.nvidia.com/gpu":"2", "persistentvolumeclaims":"5", "requests.storage":"500Gi"},
     "big": {"cpu":"32.5", "memory":"250Gi", "requests.nvidia.com/gpu":"4", "persistentvolumeclaims":"5", "requests.storage":"1Ti"},
 }
 

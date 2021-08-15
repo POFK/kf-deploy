@@ -224,7 +224,7 @@ spec:
       cpu: "24.5"
       memory: 128Gi
       requests.nvidia.com/gpu: "2"
-      persistentvolumeclaims: "4"
+      persistentvolumeclaims: "5"
       requests.storage: "500Gi"
 ```
 Add profile by 
@@ -247,7 +247,7 @@ kubectl edit profile ${NAME}
     cpu: "12.5"
     memory: 64Gi
     requests.nvidia.com/gpu: "1"
-    persistentvolumeclaims: "3"
+    persistentvolumeclaims: "5"
     requests.storage: "100Gi"
   ```
 1. 一般人员： 长期使用，但没有重度并行计算需求，如研究生和工作人员
@@ -257,7 +257,7 @@ kubectl edit profile ${NAME}
     cpu: "24.5"
     memory: 128Gi
     requests.nvidia.com/gpu: "2"
-    persistentvolumeclaims: "4"
+    persistentvolumeclaims: "5"
     requests.storage: "500Gi"
   ```
 1. 需要额外的计算资源： 有相关需求请联系管理员手动修改权限
