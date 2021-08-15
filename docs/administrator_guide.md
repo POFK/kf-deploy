@@ -6,7 +6,7 @@
 机器上使用不同版本tensorflow 时，会需要首先安装对应版本的驱动和cuda 环境，这会给
 很多初学者带来困扰。 
 
-基于Docker 的硬件虚拟化和插件可以为让每个用户构筑适合于自己程序的独立运行环境镜
+基于Docker 的硬件虚拟化和插件可以让每个用户构筑适合于自己程序的独立运行环境镜
 像，能很好地解决cuda 版本的兼容性。但这需要用户学习一系列的前置技能，在目前天文
 领域学生的知识结构下，难以真正推广。
 
@@ -118,6 +118,7 @@ tar xvf $kf_base_dir/kfctl_v1.2.0.tar.gz -C $kf_base_dir
 source config/env.sh
 ```
 change `localPath` item in `${KF_DIR}/kfctl_istio_dex.yaml`
+
 ### build
 ```
 kfctl build -V -f ${CONFIG_FILE}
@@ -166,33 +167,47 @@ docker load < image.tar
 ```
 
 ### Edit the configuration files
-需要更改 kustomize 中的 `dex`, `oidc-authservice` 目录以配置 github oidc 登陆认
-证。参考 `config/dex` 等。
+需要更改 kustomize 中的 `dex`, `oidc-authservice`, `kubeflow-apps` 目录以配置
+github oidc 登陆认证。参考 `config/dex` 等。
 
 ### apply
 ```
 kfctl apply -V -f ${CONFIG_FILE}
 ```
 
-## tls (TODO)
-tls 可以通过https 加密协议保障安全，但直接配置后发现https url 访问无法直接连通，
-由于时间有限，tls 配置留待之后有时间再解决。
-```
-kubectl create secret tls login.gnova.ccg.tls --cert=ssl/cert.pem --key=ssl/key.pem -n auth
-```
 
-# pvc
+### pvc
+#### create local storage with dynamic pvc
 ```
 kubectl apply -f pvc/local-path-storage.yaml
 ```
+#### nfs data volume for shared data
+为了使每个用户可以在jupyter notebook 中挂载nova nfs 数据卷，必须为每个user
+profile 创建相应的pv 和 pvc, 详细操作参考[这里](#data-vol).
 
+- https://stackoverflow.com/questions/63864416/kubernetes-2-pvcs-in-2-namespaces-binding-to-the-same-pv-one-successful-one-f
 - https://v1-2-branch.kubeflow.org/docs/distributions/kfctl/multi-user/#provisioning-of-persistent-volumes-in-kubernetes
 
-## 添加用户
+## Create accounts
 ### Add user to github team
 Add user email to CCG-ML/flow-user member
 
-### Create user profile
+### User create profile
+为了便于管理，我选择手动为每个用户在开通时设置相应的Profile 权限，这可以方便限制
+用户可以调动的资源。先由kubeflow 自带的profile自动生成系统产生profile,然后手动修
+改资源权限也可以达到同样的目的，但这会使管理员的工作流程变复杂。
+
+然而由于我不知道的原因，发现手动生成的profile 会让
+`ml-pipeline-visualizationserver` 和 `ml-pipeline-ui-artifact` 无法正常运行，这
+或许是因为 `serviceaccounts` 等设置不合理[See it: Profile creation through
+central dashboard vs kubectl YAML does not have the same
+behavior](https://github.com/kubeflow/kubeflow/issues/4965). 
+
+以上问题或许会导致kubeflow pipeline 无法正常工作，但 jupyter notebook 目前已经足
+够满足需求，所以问题留待以后有时间再解决。
+
+用于生成profile 的脚本参见 [这里](#profile_pvc).
+
 #### An example for profile
 ```
 apiVersion: kubeflow.org/v1beta1
@@ -206,11 +221,11 @@ spec:
 
   resourceQuotaSpec:    # resource quota can be set optionally
     hard: #mid
-      cpu: "24"
-      memory: 128G
+      cpu: "24.5"
+      memory: 128Gi
       requests.nvidia.com/gpu: "2"
-      persistentvolumeclaims: "2"
-      requests.storage: "500G"
+      persistentvolumeclaims: "4"
+      requests.storage: "500Gi"
 ```
 Add profile by 
 ```
@@ -223,38 +238,109 @@ You can get or edit profiles use these commands.
 kubectl get profiles
 kubectl edit profile ${NAME}
 ```
-由于机器多人共用，这里设置了三个不同的资源限制以满足不同用户的需求。
+由于机器多人共用，这里设置了三种不同的资源限制以满足不同用户的需求。
 
 1. 临时人员： 短期使用或者有较小的计算资源需求，如本科生，实习生等
   ```
   # small level
   hard:
-    cpu: "12"
-    memory: 64G
+    cpu: "12.5"
+    memory: 64Gi
     requests.nvidia.com/gpu: "1"
-    persistentvolumeclaims: "1"
-    requests.storage: "100G"
+    persistentvolumeclaims: "3"
+    requests.storage: "100Gi"
   ```
 1. 一般人员： 长期使用，但没有重度并行计算需求，如研究生和工作人员
   ```
   # mid level
   hard:
-    cpu: "24"
-    memory: 128G
+    cpu: "24.5"
+    memory: 128Gi
     requests.nvidia.com/gpu: "2"
-    persistentvolumeclaims: "2"
-    requests.storage: "500G"
+    persistentvolumeclaims: "4"
+    requests.storage: "500Gi"
   ```
 1. 需要额外的计算资源： 有相关需求请联系管理员手动修改权限
   ```
   # big level
   hard:
-    cpu: "48"
-    memory: 250G
+    cpu: "32.5"
+    memory: 250Gi
     requests.nvidia.com/gpu: "4"
-    persistentvolumeclaims: "3"
-    requests.storage: "1T"
+    persistentvolumeclaims: "5"
+    requests.storage: "1Ti"
   ```
+
+### shared data volume
+<a name="data-vol"></a>
+Create file `pvc.yaml`:
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: inspur-disk01-userName
+  labels:
+    node: nova
+    disk: inspur-disk01
+    user: userName
+    type: nfs
+spec:
+  capacity:
+    storage: 10G
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: data-vol
+  nfs:
+    server: nova
+    path: "/data/inspur_disk01/userdir/gnova"
+    readOnly: true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-vol
+  namespace: userName
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: data-vol
+  resources:
+    requests:
+      storage: 1G
+  selector: 
+    matchLabels:
+      node: nova
+      disk: inspur-disk01
+      user: userName
+      type: nfs
+```
+and run
+```
+kubectl apply -f pvc.yaml
+```
+
+### profile and pvc script
+<a name="profile_pvc"></a>
+为了方便起见，我写了一个脚本用于生成新用户对应的profile 以及 mount shared volume.
+```
+cd profile
+python user_init.py --user test --email test@gmail.com --level mid --mode all
+```
+用于查看生成的配置文件。
+```
+cd profile
+python user_init.py --user test --email test@gmail.com --level mid --mode all | kubectl apply -f -
+```
+用于部署生成的配置文件。
+
+## tls (TODO)
+tls 可以通过https 加密协议保障安全，但直接配置后发现https url 访问无法直接连通，
+由于时间有限，tls 配置留待之后有时间再解决。
+```
+kubectl create secret tls login.gnova.ccg.tls --cert=ssl/cert.pem --key=ssl/key.pem -n auth
+```
+
 
 ## References
 1. https://towardsdatascience.com/deploying-kubeflow-to-a-bare-metal-gpu-cluster-from-scratch-6865ebcde032

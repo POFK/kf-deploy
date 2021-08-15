@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: inspur-disk01-userName
+  labels:
+    node: nova
+    disk: inspur-disk01
+    user: userName
+    type: nfs
+spec:
+  capacity:
+    storage: 10G
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: data-vol
+  nfs:
+    server: nova
+    path: "/data/inspur_disk01/userdir/gnova"
+    readOnly: true
