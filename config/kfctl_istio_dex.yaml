@@ -89,11 +89,6 @@ spec:
         name: manifests
         path: kfserving/installs/generic
     name: kfserving
-  - kustomizeConfig:
-      repoRef:
-        name: manifests
-        path: dex-auth/dex-authenticator/base
-    name: dex-authenticator
   repos:
   - name: manifests
     uri: https://github.com/kubeflow/manifests/archive/v1.2-branch.tar.gz
