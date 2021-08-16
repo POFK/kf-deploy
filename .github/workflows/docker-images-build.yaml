@@ -27,7 +27,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: images/pytorch-notebook
-          file: images/pytorch-notebook/Dockerfile
+          context: images
+          file: images/Dockerfile.pytorch.gpu
           push: true
           tags: txmao/kubeflow-pytorch-1.7.1-notebook-gpu:latest
