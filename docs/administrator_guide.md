@@ -334,6 +334,9 @@ python user_init.py --user test --email test@gmail.com --level mid --mode all | 
 ```
 用于部署生成的配置文件。
 
+## Pytorch notebook image
+https://github.com/kubeflow/kubeflow/issues/1057#issuecomment-697443262
+
 ## tls (TODO)
 tls 可以通过https 加密协议保障安全，但直接配置后发现https url 访问无法直接连通，
 由于时间有限，tls 配置留待之后有时间再解决。
