@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import yaml
+import glob
 
 res_dict = {
     "small": {"cpu":"12.5", "memory":"64Gi", "requests.nvidia.com/gpu":"1", "persistentvolumeclaims":"5", "requests.storage":"100Gi"},
@@ -17,6 +18,7 @@ class User(object):
         self.profile = None
         self.pv = None
         self.pvc = None
+        self.PodDefaultEnv = None
 
 
     def __str__(self):
@@ -28,6 +30,10 @@ class User(object):
             text += yaml.dump(self.pv)
             text += "---\n"
             text += yaml.dump(self.pvc)
+            text += "---\n"
+        if self.PodDefaultEnv:
+            text += self.PodDefaultEnv
+            text += "---\n"
         return text
 
     def loadconfig(self, file):
@@ -44,7 +50,7 @@ class User(object):
 
     def gen_profile(self):
         self.profile = self.loadconfig("profile-temp.yaml")
-        self.profile['spec']['resourceQuotaSpec'] = res_dict[self.rl]
+        self.profile['spec']['resourceQuotaSpec']['hard'] = res_dict[self.rl]
         self.profile['metadata']['name'] = self.user_pref + self.user
         self.profile['spec']['owner']['name'] = "/user/"+self.email
 
@@ -59,12 +65,29 @@ class User(object):
         self.pv['metadata']['labels']["user"] = self.user_pref + self.user
         self.pv['spec']['nfs']["path"] = os.path.join(self.pv['spec']['nfs']["path"], self.user)
 
+    def parse_pod_default(self, fp):
+        data = self.loadconfig(fp)
+        data['metadata']['namespace'] = self.user_pref + self.user
+        return data
+
+    def gen_PodDefaultEnv(self):
+        files = glob.glob("PodDefault*.yaml")
+        text = ""
+        for fp in files:
+            data  = self.parse_pod_default(fp)
+            text += yaml.dump(data)
+            text += "---\n"
+        text = text[:-4]
+        self.PodDefaultEnv = text
+
     def gen(self, mode):
         if mode == "all" or mode == "pv":
             self.gen_pvc()
             self.gen_pv()
         if mode == "all" or mode == "profile":
             self.gen_profile()
+        if mode == "all" or mode == "pod":
+            self.gen_PodDefaultEnv()
 
 
 if __name__ == '__main__':
@@ -73,7 +96,7 @@ if __name__ == '__main__':
     parser.add_argument('--user', type=str, help='User name')
     parser.add_argument('--email', type=str, help='User email')
     parser.add_argument('--level', type=str, choices=['small', 'mid', 'big'],help='Resources level')
-    parser.add_argument('--mode', type=str, default="all", choices=['all', 'pv', 'profile'],help='generate pv, profile or all of them')
+    parser.add_argument('--mode', type=str, default="all", choices=['all', 'pv', 'profile', "pod"],help='generate pv, profile, PodDefault env or all of them')
     args = parser.parse_args()
     u = User(args.user,args.email,args.level)
     u.gen(mode=args.mode)

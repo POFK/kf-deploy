@@ -1,0 +1,13 @@
+apiVersion: "kubeflow.org/v1alpha1"
+kind: PodDefault
+metadata:
+  name: add-env-nccl-socket-ifname
+  namespace: userName
+spec:
+ selector:
+  matchLabels:
+    ADD_NCCL_SOCKET_IFNAME: "true"
+ desc: "NCCL_SOCKET_IFNAME=lo"
+ env:
+ - name: NCCL_SOCKET_IFNAME
+   value: lo

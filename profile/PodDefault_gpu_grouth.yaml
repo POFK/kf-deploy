@@ -1,0 +1,13 @@
+apiVersion: "kubeflow.org/v1alpha1"
+kind: PodDefault
+metadata:
+  name: add-env-gpu-allow-growth
+  namespace: userName
+spec:
+ selector:
+  matchLabels:
+    ADD_TF_FORCE_GPU_ALLOW_GROWTH: "true"
+ desc: "TF_FORCE_GPU_ALLOW_GROWTH=true"
+ env:
+ - name: TF_FORCE_GPU_ALLOW_GROWTH
+   value: "true"

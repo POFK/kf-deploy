@@ -140,7 +140,9 @@ spawnerFormDefaults:
     # value:
     #   - add-gcp-secret
     #   - default-editor
-    value: []
+    value: 
+      - ADD_NCCL_SOCKET_IFNAME 
+      - ADD_TF_FORCE_GPU_ALLOW_GROWTH
     readOnly: false
   affinityConfig:
     # The default `configKey` from the options list
