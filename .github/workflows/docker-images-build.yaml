@@ -30,4 +30,4 @@ jobs:
           context: images
           file: images/Dockerfile.pytorch.gpu
           push: true
-          tags: txmao/kubeflow-pytorch-1.7.1-notebook-gpu:latest
+          tags: txmao/kubeflow-pytorch-1.7.1-notebook-gpu:latest1
