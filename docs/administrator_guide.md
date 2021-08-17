@@ -337,6 +337,16 @@ python user_init.py --user test --email test@gmail.com --level mid --mode all | 
 ## Pytorch notebook image
 https://github.com/kubeflow/kubeflow/issues/1057#issuecomment-697443262
 
+## Tips
+### Multi-gpus hangs in jupyter notebook
+It may because [istio-proxy sidecar cut off NCCL communication](https://github.com/tensorflow/tensorflow/issues/38982#issuecomment-629786989).
+Add `NCCL_SOCKET_IFNAME=lo` env help to solve it, [see this comment](https://github.com/NVIDIA/nccl/issues/352#issuecomment-656899763).
+[This page](https://github.com/kubeflow/kubeflow/blob/master/components/admission-webhook/README.md) provide an example for how to add env var on notebook container.
+
+### tensorflow: not use all GPU memory
+Add env: `TF_FORCE_GPU_ALLOW_GROWTH=true`
+
+
 ## tls (TODO)
 tls 可以通过https 加密协议保障安全，但直接配置后发现https url 访问无法直接连通，
 由于时间有限，tls 配置留待之后有时间再解决。
@@ -362,9 +372,13 @@ kubectl create secret tls login.gnova.ccg.tls --cert=ssl/cert.pem --key=ssl/key.
 1. https://docs.docker.com/config/daemon/systemd/#httphttps-proxy
 1. https://github.com/NVIDIA/k8s-device-plugin#quick-start
 1. https://illya13.github.io/RL/tutorial/2020/05/03/install-kubeflow-on-single-node-kubernetes-v1.18.2.html
+1. https://jupyter-docker-stacks.readthedocs.io/en/latest/
+1. https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook
+1. http://www.vanguard-ai.com/upload/default/20200129/2925e4e54f27ccdc1be017a440cc4773.pdf
 
 ## nexus raw repositories
 - http://nexus.nova.ccg/repository/raw-host/
 - http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/v1.2-branch.tar.gz
 - http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
 - http://nexus.nova.ccg/repository/raw-host/kubeflow/tools/kfctl_istio_dex.v1.2.0.yaml
+
