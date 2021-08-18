@@ -21,7 +21,7 @@ spawnerFormDefaults:
     value: txmao/kubeflow-images-public-tensorflow-2.1.0-notebook-gpu:1.0.0
     # The list of available standard container Images
     options:
-      - txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0-gpu:1.0.0
+      - txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0
       - txmao/kf-jupyter-tensorflow-2.1.0-gpu:1.0.0
       - txmao/kf-jupyter-tensorflow-1.15.2-gpu:1.0.0
     # By default, custom container Images are allowed
