@@ -23,6 +23,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
+
       -
         name: image for pytorch 1.7.1
         uses: docker/build-push-action@v2
@@ -30,7 +42,7 @@ jobs:
           context: images
           file: images/Dockerfile.pytorch.gpu
           push: true
-          tags: txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0
+          tags: txmao/kf-jupyter-pytorch-1.7.1-gpu:${{ steps.vars.outputs.tag }}
 
       -
         name: image for tf2.1.0
@@ -39,7 +51,7 @@ jobs:
           context: images
           file: images/Dockerfile.tf210.gpu
           push: true
-          tags: txmao/kf-jupyter-tensorflow-2.1.0-gpu:1.0.0
+          tags: txmao/kf-jupyter-tensorflow-2.1.0-gpu:${{ steps.vars.outputs.tag }}
 
       -
         name: image for tf1.15.2
@@ -48,4 +60,4 @@ jobs:
           context: images
           file: images/Dockerfile.tf115.gpu
           push: true
-          tags: txmao/kf-jupyter-tensorflow-1.15.2-gpu:1.0.0
+          tags: txmao/kf-jupyter-tensorflow-1.15.2-gpu:${{ steps.vars.outputs.tag }}
