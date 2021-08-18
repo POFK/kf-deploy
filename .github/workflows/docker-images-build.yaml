@@ -24,10 +24,28 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
+        name: image for pytorch 1.7.1
         uses: docker/build-push-action@v2
         with:
           context: images
           file: images/Dockerfile.pytorch.gpu
           push: true
-          tags: txmao/kubeflow-pytorch-1.7.1-notebook-gpu:latest1
+          tags: txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0-gpu:1.0.0
+
+      -
+        name: image for tf2.1.0
+        uses: docker/build-push-action@v2
+        with:
+          context: images
+          file: images/Dockerfile.tf210.gpu
+          push: true
+          tags: txmao/kf-jupyter-tensorflow-2.1.0-gpu:1.0.0
+
+      -
+        name: image for tf1.15.2
+        uses: docker/build-push-action@v2
+        with:
+          context: images
+          file: images/Dockerfile.tf115.gpu
+          push: true
+          tags: txmao/kf-jupyter-tensorflow-1.15.2-gpu:1.0.0

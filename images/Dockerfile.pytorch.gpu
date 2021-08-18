@@ -1,27 +1,18 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 #ARG BASE_CONTAINER=jupyter/scipy-notebook:python-3.9.6
-ARG BASE_CONTAINER=cschranz/gpu-jupyter:v1.4_cuda-10.1_ubuntu-18.04_python-only
+ARG BASE_CONTAINER=gcr.io/kubeflow-images-public/tensorflow-2.1.0-notebook-gpu:1.0.0
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Tianxiang Mao<mtianxiang@gmail.com>"
 
-USER $NB_UID
-
-#RUN conda config --system --append channels pytorch
-#
-#RUN conda install --quiet --yes -c pytorch \
-#    'pytorch==1.7.1' \
-#    'torchvision=0.8.2' \
-#    'torchaudio==0.7.2' \
-#    'cudatoolkit=10.1' \
-#    && \
-#    conda clean --all -f -y && \
-#    fix-permissions "${CONDA_DIR}" && \
-#    fix-permissions "/home/${NB_USER}"
+USER root
+RUN echo "[global]\nindex-url = http://nexus.nova.ccg/repository/pypi/simple\n[install]\ntrusted-host=nexus.nova.ccg" >> /usr/pip.conf
+RUN pip uninstall tensorflow-gpu
+RUN pip install torch==1.7.1+cu101 torchvision==0.8.2+cu101 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 
 # Configure container startup
 EXPOSE 8888
 USER jovyan
 ENTRYPOINT ["tini", "--"]
-CMD ["sh","-c", "jupyter notebook --notebook-dir=/home/${NB_USER} --ip=0.0.0.0 --no-browser --allow-root --port=8888 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.allow_origin='*' --NotebookApp.base_url=${NB_PREFIX}"]
+CMD ["sh","-c", "jupyter notebook --notebook-dir=/home/${NB_USER} --ip=0.0.0.0 --no-browser --port=8888 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.allow_origin='*' --NotebookApp.base_url=${NB_PREFIX}"]

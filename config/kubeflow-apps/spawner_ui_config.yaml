@@ -21,11 +21,9 @@ spawnerFormDefaults:
     value: txmao/kubeflow-images-public-tensorflow-2.1.0-notebook-gpu:1.0.0
     # The list of available standard container Images
     options:
-      - txmao/kubeflow-images-public-tensorflow-2.1.0-notebook-gpu:1.0.0
-      - gcr.io/kubeflow-images-public/tensorflow-1.15.2-notebook-cpu:1.0.0
-      - gcr.io/kubeflow-images-public/tensorflow-1.15.2-notebook-gpu:1.0.0
-      - gcr.io/kubeflow-images-public/tensorflow-2.1.0-notebook-cpu:1.0.0
-      - gcr.io/kubeflow-images-public/tensorflow-2.1.0-notebook-gpu:1.0.0
+      - txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0-gpu:1.0.0
+      - txmao/kf-jupyter-tensorflow-2.1.0-gpu:1.0.0
+      - txmao/kf-jupyter-tensorflow-1.15.2-gpu:1.0.0
     # By default, custom container Images are allowed
     # Uncomment the following line to only enable standard container Images
     readOnly: false
@@ -143,7 +141,7 @@ spawnerFormDefaults:
     value: 
       - ADD_NCCL_SOCKET_IFNAME 
       - ADD_TF_FORCE_GPU_ALLOW_GROWTH
-    readOnly: false
+    readOnly: true
   affinityConfig:
     # The default `configKey` from the options list
     # If readonly, the default value will be the only option
