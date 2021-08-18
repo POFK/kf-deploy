@@ -18,7 +18,7 @@ spawnerFormDefaults:
   image:
     # The container Image for the user's Jupyter Notebook
     # If readonly, this value must be a member of the list below
-    value: txmao/kubeflow-images-public-tensorflow-2.1.0-notebook-gpu:1.0.0
+    value: txmao/kf-jupyter-tensorflow-2.1.0-gpu:v2.0
     # The list of available standard container Images
     options:
       - txmao/kf-jupyter-pytorch-1.7.1-gpu:v2.0
