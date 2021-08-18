@@ -95,5 +95,5 @@ spec:
   version: v1.2-branch
 status:
   reposCache:
-  - localPath: "${KF_DIR}/.cache/manifests/manifests-1.2-branch"
+  - localPath: '"${KF_DIR}/.cache/manifests/manifests-1.2-branch"'
     name: manifests
