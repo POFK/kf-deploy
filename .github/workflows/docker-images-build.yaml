@@ -30,7 +30,7 @@ jobs:
           context: images
           file: images/Dockerfile.pytorch.gpu
           push: true
-          tags: txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0-gpu:1.0.0
+          tags: txmao/kf-jupyter-pytorch-1.7.1-gpu:1.0.0
 
       -
         name: image for tf2.1.0
