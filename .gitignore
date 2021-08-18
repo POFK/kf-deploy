@@ -130,3 +130,6 @@ dmypy.json
 
 # env
 *params.env
+
+# profiles
+profiles_ccg/
