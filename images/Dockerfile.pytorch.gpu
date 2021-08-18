@@ -7,7 +7,10 @@ FROM $BASE_CONTAINER
 LABEL maintainer="Tianxiang Mao<mtianxiang@gmail.com>"
 
 USER root
-RUN echo "[global]\nindex-url = http://nexus.nova.ccg/repository/pypi/simple\n[install]\ntrusted-host=nexus.nova.ccg" >> /usr/pip.conf
+RUN echo "[global]
+    index-url = http://nexus.nova.ccg/repository/pypi/simple
+[install]
+    trusted-host=nexus.nova.ccg" >> /usr/pip.conf
 RUN pip uninstall -y tensorflow-gpu
 RUN yes | pip install torch==1.7.1+cu101 torchvision==0.8.2+cu101 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 
