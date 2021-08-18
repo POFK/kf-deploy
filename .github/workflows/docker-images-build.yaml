@@ -2,8 +2,8 @@ name: build_docker_images
 
 on:
   push:
-    branches:
-      - 'master'
+    tags:
+      - v*
 jobs:
   docker:
     runs-on: ubuntu-latest
